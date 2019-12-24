@@ -1,6 +1,6 @@
 # Wireguard Cli
 
-[WIP] 🚧 Currently in WIP 🚧
+🚧 Currently in WIP 🚧
 
 CLI helper to handle the basic WireGuard configuration stuff.
 
