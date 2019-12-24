@@ -4,7 +4,7 @@ TARGET_FOLDER="./configurations"
 
 usage()
 {
-    echo "usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name] | [-c client-name ip mask] | [-h]]"
+    echo "Usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name] | [-c client-name ip mask] | [-h]]"
 }
 
 generate_key()
