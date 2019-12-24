@@ -6,7 +6,7 @@ CLI helper to handle the basic WireGuard configuration stuff.
 
 ## Install WireGuard on your Server / Client
 
-![Official setup guide](https://www.wireguard.com/install/)
+[Official setup guide](https://www.wireguard.com/install/)
 
 ## Usage
 
