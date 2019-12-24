@@ -1,0 +1,65 @@
+#!/bin/bash
+
+TARGET_FOLDER="./configurations"
+
+usage()
+{
+    echo "usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name] | [-c client-name ip mask] | [-h]]"
+}
+
+generate_key()
+{
+    TARGET_KEY_FOLDER=$TARGET_FOLDER/$1/keys
+    echo "> Generating a new private and public key for « $1 »"
+    mkdir -p $TARGET_KEY_FOLDER
+    cd $TARGET_KEY_FOLDER
+    umask 077
+    wg genkey | tee privatekey | wg pubkey > publickey
+    echo "> New key generated in « $TARGET_KEY_FOLDER »"
+}
+
+init_server()
+{
+    echo "> Create a new server configuration"
+}
+
+create_client()
+{
+    echo "> Create a new client configuration for « $1 »"
+}
+
+add_client()
+{
+    echo "> Add client « $1 » to the server configuration"
+}
+
+while [ "$1" != "" ]; do
+    case $1 in
+        -g | --generate-key )   shift
+                                if [ -z "$1" ]; then
+                                    generate_key "server"
+                                else
+                                    generate_key "clients/$1"
+                                fi
+                                exit
+                                ;;
+        -i | --init-server )    shift
+                                init_server
+                                exit
+                                ;;
+        -c | --create-client )  shift
+                                create_client
+                                exit
+                                ;;
+        -a | --add-client )     shift
+                                add_client
+                                exit
+                                ;;
+        -h | --help )           usage
+                                exit
+                                ;;
+        * )                     usage
+                                exit 1
+    esac
+    shift
+done
