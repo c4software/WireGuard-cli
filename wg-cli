@@ -1,6 +1,9 @@
 #!/bin/bash
 
 TARGET_FOLDER="./configurations"
+SERVER_PORT="9888"
+SERVER_IP="10.200.200.1/32"
+SERVER_INTERFACE="enp0s3"
 
 usage()
 {
@@ -20,7 +23,29 @@ generate_key()
 
 init_server()
 {
+    PRIVATEKEY="`cat $TARGET_FOLDER/server/keys/privatekey 2>/dev/null`"
+    if [ -z "$PRIVATEKEY" ]; then
+        echo "⚠️ Please generate a server key before generate the configuration."
+        echo "usage: wg-cli -g"
+        exit 1
+    fi
+
     echo "> Create a new server configuration"
+
+    echo "[Interface]
+PrivateKey = $PRIVATEKEY
+Address = $SERVER_IP
+ListenPort = $SERVER_PORT
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -A POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -D POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE
+" > $TARGET_FOLDER/server/wg0.conf
+
+    echo ""
+    echo "If you want Internet shared with your client, don't forget to enable ipv4 forwarding."
+    echo "vim /etc/systctl.conf"
+    echo "# and then"
+    echo "sysctl -p"
+    echo ""
 }
 
 create_client()
