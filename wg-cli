@@ -7,10 +7,12 @@ SERVER_IP="10.200.200.1/32"
 SERVER_INTERFACE="enp0s3"
 SERVER_DNS="1.1.1.1"
 
+# Todo rewrite IP/Mask client
+
 usage()
 {
     echo ""
-    echo "Usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name] | [-c client-name ip mask] | [-h] | [-q client-name]]"
+    echo "Usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name ip/mask] | [-c client-name ip/mask] | [-h] | [-q client-name]]"
     echo ""
 }
 
