@@ -12,7 +12,7 @@ SERVER_DNS="1.1.1.1"
 usage()
 {
     echo ""
-    echo "Usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name ip/mask] | [-c client-name ip/mask] | [-h] | [-q client-name]]"
+    echo "Usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name ip/mask] | [-c client-name] | [-h] | [-q client-name]]"
     echo ""
 }
 
@@ -135,7 +135,7 @@ AllowedIPs = 0.0.0.0/0, ::/0
 add_client()
 {
     CLIENT_PATH=$1
-    CLIENT_IP=$2
+    CLIENT_IP=$2 # TODO READ IP FROM CONFIGURATION FILE
     CLIENT_TARGET_PATH="$TARGET_FOLDER/$CLIENT_PATH"
     SERVER_CONFIGURATION_FILE_PATH="$TARGET_FOLDER/wg0.conf"
 
