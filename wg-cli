@@ -3,11 +3,11 @@
 TARGET_FOLDER="./configurations"
 SERVER_PORT="9888"
 SERVER_ENDPOINT="YOUR_SERVER_EXTERNAL_IP:$SERVER_PORT"
-SERVER_IP="10.200.200.1/32"
 SERVER_INTERFACE="enp0s3"
+IP_BASE="10.200.200"
+MASK="32"
+SERVER_IP="$IP_BASE.1/$MASK"
 SERVER_DNS="1.1.1.1"
-
-# Todo rewrite IP/Mask client
 
 usage()
 {
@@ -83,8 +83,11 @@ PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING 
 create_client()
 {
     CLIENT_PATH=$1
-    CLIENT_IP=$2
     CLIENT_TARGET_PATH="$TARGET_FOLDER/$CLIENT_PATH"
+
+    CLIENTS_FOLDER_PATH="$TARGET_FOLDER/clients/"
+    CLIENT_COUNT=`ls -l $CLIENTS_FOLDER_PATH | grep -c ^d`
+    CLIENT_IP="$IP_BASE.$((CLIENT_COUNT+1))/$MASK"
 
     if [ -d "$CLIENT_TARGET_PATH" ]; then
         echo "Client configuration folder seems already present… Ignoring !"
@@ -190,10 +193,7 @@ while [ "$1" != "" ]; do
                                 ;;
         -c | --create-client )  shift
                                 if [ -z "$1" ]; then
-                                    echo "Usage: wg-cli -c client_name IP/MASK (ex. wg-cli -c pixel4 '10.200.200.2/32')"
-                                    exit 1
-                                elif [ -z "$2" ]; then
-                                    echo "Usage: wg-cli -c client_name IP/MASK (ex. wg-cli -c pixel4 '10.200.200.2/32')"
+                                    echo "Usage: wg-cli -c client_name"
                                     exit 1
                                 else
                                     create_client "clients/$1" "$2"
