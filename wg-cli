@@ -132,6 +132,10 @@ get_client_qr(){
     CLIENT_TARGET_PATH="$TARGET_FOLDER/$CLIENT_PATH"
 
     qrencode -t ansiutf8 < "$CLIENT_TARGET_PATH/wg0.conf"
+
+    echo ""
+    echo "You can scan this QRCode with your Wireguard application to add the client configuration on your smarpthone."
+    echo ""
 }
 
 while [ "$1" != "" ]; do
