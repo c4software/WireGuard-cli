@@ -10,19 +10,27 @@ SERVER_DNS="1.1.1.1"
 usage()
 {
     echo ""
-    echo "Usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name] | [-c client-name ip mask] | [-h] | [-q]]"
+    echo "Usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name] | [-c client-name ip mask] | [-h] | [-q client-name]]"
     echo ""
 }
 
 generate_key()
 {
     TARGET_KEY_FOLDER=$TARGET_FOLDER/$1/keys
+    if [ -z "$1" ]; then
+        TARGET_KEY_FOLDER=$TARGET_FOLDER/keys
+    fi
     CURRENT_PATH="`pwd`"
 
+    if [ -f "$TARGET_KEY_FOLDER/privatekey" ]; then
+        echo "Key pair seems already present… Ignoring !"
+        return
+    fi
+
     echo ""
-    echo "====================================================="
-    echo "= Generating a new Public / Private keys for « $1 » ="
-    echo "====================================================="
+    echo "=============================================="
+    echo "= Generating a new Public / Private keys for ="
+    echo "=============================================="
 
     mkdir -p $TARGET_KEY_FOLDER
     cd $TARGET_KEY_FOLDER
@@ -37,10 +45,11 @@ generate_key()
 init_server()
 {
     # Get the private key of the server
-    PRIVATEKEY="`cat $TARGET_FOLDER/server/keys/privatekey 2>/dev/null`"
+    PRIVATEKEY="`cat $TARGET_FOLDER/keys/privatekey 2>/dev/null`"
     if [ -z "$PRIVATEKEY" ]; then
-        generate_key "server"
-        PRIVATEKEY="`cat $TARGET_FOLDER/server/keys/privatekey 2>/dev/null`"
+        # No key ? Generate a new key pair
+        generate_key ""
+        PRIVATEKEY="`cat $TARGET_FOLDER/keys/privatekey 2>/dev/null`"
     fi
 
     echo ""
@@ -55,7 +64,7 @@ Address = $SERVER_IP
 ListenPort = $SERVER_PORT
 PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -A POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE
 PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -D POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE
-" > "$TARGET_FOLDER/server/wg0.conf"
+" > "$TARGET_FOLDER/wg0.conf"
 
 
     # Enable IPV4 forwarding
@@ -84,10 +93,10 @@ create_client()
     mkdir -p "$CLIENT_TARGET_PATH/"
 
     # Get the public key of the server
-    SERVER_PUBLICKEY="`cat $TARGET_FOLDER/server/keys/publickey 2>/dev/null`"
+    SERVER_PUBLICKEY="`cat $TARGET_FOLDER/keys/publickey 2>/dev/null`"
     if [ -z "$SERVER_PUBLICKEY" ]; then
-        generate_key "server"
-        SERVER_PUBLICKEY="`cat $TARGET_FOLDER/server/keys/publickey 2>/dev/null`"
+        generate_key ""
+        SERVER_PUBLICKEY="`cat $TARGET_FOLDER/keys/publickey 2>/dev/null`"
     fi
 
     # Get the private key of the client
@@ -142,7 +151,7 @@ while [ "$1" != "" ]; do
     case $1 in
         -g | --generate-key )   shift
                                 if [ -z "$1" ]; then
-                                    generate_key "server"
+                                    generate_key ""
                                 else
                                     generate_key "clients/$1"
                                 fi
