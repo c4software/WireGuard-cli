@@ -131,7 +131,7 @@ get_client_qr(){
     CLIENT_PATH=$1
     CLIENT_TARGET_PATH="$TARGET_FOLDER/$CLIENT_PATH"
 
-    qrencode -t ansiutf8 < "CLIENT_TARGET_PATH/wg0.conf"
+    qrencode -t ansiutf8 < "$CLIENT_TARGET_PATH/wg0.conf"
 }
 
 while [ "$1" != "" ]; do
@@ -163,7 +163,7 @@ while [ "$1" != "" ]; do
                                 exit
                                 ;;
         -q | --get-client-qr )  shift
-                                get_client_qr
+                                get_client_qr "clients/$1"
                                 exit
                                 ;;
         -h | --help )           usage
