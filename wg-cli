@@ -10,7 +10,7 @@ SERVER_DNS="1.1.1.1"
 usage()
 {
     echo ""
-    echo "Usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name] | [-c client-name ip mask] | [-h]]"
+    echo "Usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name] | [-c client-name ip mask] | [-h] | [-q]]"
     echo ""
 }
 
@@ -20,7 +20,9 @@ generate_key()
     CURRENT_PATH="`pwd`"
 
     echo ""
-    echo "> Generating a new Public / Private keys for « $1 »"
+    echo "====================================================="
+    echo "= Generating a new Public / Private keys for « $1 » ="
+    echo "====================================================="
 
     mkdir -p $TARGET_KEY_FOLDER
     cd $TARGET_KEY_FOLDER
@@ -42,7 +44,9 @@ init_server()
     fi
 
     echo ""
-    echo "> Create a new server configuration"
+    echo "====================================="
+    echo "= Create a new server configuration ="
+    echo "====================================="
 
     # Server configuration
     echo "[Interface]
@@ -52,6 +56,11 @@ ListenPort = $SERVER_PORT
 PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -A POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE
 PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -D POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE
 " > "$TARGET_FOLDER/server/wg0.conf"
+
+
+    # Enable IPV4 forwarding
+    # perl -pi -e 's/#{1,}?net.ipv4.ip_forward ?= ?(0|1)/net.ipv4.ip_forward = 1/g' /etc/sysctl.conf 
+    # sysctl -p
 
     echo ""
     echo "If you want Internet shared with your client, don't forget to enable ipv4 forwarding."
@@ -65,6 +74,11 @@ create_client()
     CLIENT_PATH=$1
     CLIENT_IP=$2
     CLIENT_TARGET_PATH="$TARGET_FOLDER/$CLIENT_PATH"
+
+    if [ -d "$CLIENT_TARGET_PATH" ]; then
+        echo "Client configuration folder seems already present… Ignoring !"
+        exit 1
+    fi
 
     # Create target path
     mkdir -p "$CLIENT_TARGET_PATH/"
@@ -84,7 +98,10 @@ create_client()
     fi
 
     echo ""
-    echo "> Create a new client configuration for « $1 »"
+    echo "====================================="
+    echo "= Create a new client configuration ="
+    echo "====================================="
+
 
     echo "[Interface]
 PrivateKey = $CLIENT_PRIVATE_KEY 
@@ -103,7 +120,18 @@ AllowedIPs = 0.0.0.0/0, ::/0
 
 add_client()
 {
-    echo "> Add client « $1 » to the server configuration"
+    echo ""
+    echo "================================================="
+    echo "= Add client « $1 » to the server configuration ="
+    echo "================================================="
+
+}
+
+get_client_qr(){
+    CLIENT_PATH=$1
+    CLIENT_TARGET_PATH="$TARGET_FOLDER/$CLIENT_PATH"
+
+    qrencode -t ansiutf8 < "CLIENT_TARGET_PATH/wg0.conf"
 }
 
 while [ "$1" != "" ]; do
@@ -132,6 +160,10 @@ while [ "$1" != "" ]; do
                                 ;;
         -a | --add-client )     shift
                                 add_client
+                                exit
+                                ;;
+        -q | --get-client-qr )  shift
+                                get_client_qr
                                 exit
                                 ;;
         -h | --help )           usage
