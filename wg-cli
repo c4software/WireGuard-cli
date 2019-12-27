@@ -13,6 +13,13 @@ usage()
 {
     echo ""
     echo "Usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name] | [-c client-name] | [-h] | [-q client-name]]"
+    echo "Arguments: "
+    echo "-i "
+    echo "-g "
+    echo "-a client-name "
+    echo "-c client-name "
+    echo "-q client-name        Show the QRCode of the requested « client-name »."
+    echo "-h                    Print help (this text) and exit."
     echo ""
 }
 
@@ -167,8 +174,14 @@ AllowedIPs = $CLIENT_IP" >> $SERVER_CONFIGURATION_FILE_PATH
 }
 
 get_client_qr(){
-    CLIENT_PATH=$1
-    CLIENT_TARGET_PATH="$TARGET_FOLDER/$CLIENT_PATH"
+    CLIENT_TARGET_PATH="$TARGET_FOLDER/$1"
+
+    if [ ! -f "$CLIENT_TARGET_PATH/wg0.conf" ]; then
+        echo ""
+        echo "The requested client is missing… Ignoring !"
+        echo ""
+        exit 1
+    fi
 
     qrencode -t ansiutf8 < "$CLIENT_TARGET_PATH/wg0.conf"
 
