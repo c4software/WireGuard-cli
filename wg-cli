@@ -12,7 +12,7 @@ SERVER_DNS="1.1.1.1"
 usage()
 {
     echo ""
-    echo "Usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name ip/mask] | [-c client-name] | [-h] | [-q client-name]]"
+    echo "Usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name] | [-c client-name] | [-h] | [-q client-name]]"
     echo ""
 }
 
@@ -87,7 +87,7 @@ create_client()
 
     CLIENTS_FOLDER_PATH="$TARGET_FOLDER/clients/"
     CLIENT_COUNT=`ls -l $CLIENTS_FOLDER_PATH | grep -c ^d`
-    CLIENT_IP="$IP_BASE.$((CLIENT_COUNT+1))/$MASK"
+    CLIENT_IP="$IP_BASE.$((CLIENT_COUNT+2))/$MASK"
 
     if [ -d "$CLIENT_TARGET_PATH" ]; then
         echo "Client configuration folder seems already present… Ignoring !"
@@ -135,14 +135,14 @@ AllowedIPs = 0.0.0.0/0, ::/0
 add_client()
 {
     CLIENT_PATH=$1
-    CLIENT_IP=$2 # TODO READ IP FROM CONFIGURATION FILE
     CLIENT_TARGET_PATH="$TARGET_FOLDER/$CLIENT_PATH"
     SERVER_CONFIGURATION_FILE_PATH="$TARGET_FOLDER/wg0.conf"
+    CLIENT_IP=`grep "Address = " $CLIENT_TARGET_PATH/wg0.conf | sed "s/Address = //"`
 
     # Get the public key of the client
     CLIENT_PUBLIC_KEY="`cat $TARGET_FOLDER/$CLIENT_PATH/keys/publickey 2>/dev/null`"
     if [ -z "$CLIENT_PUBLIC_KEY" ]; then
-        generate_key $CLIENT_PATH
+        create_client $CLIENT_PATH
         CLIENT_PUBLIC_KEY="`cat $TARGET_FOLDER/$CLIENT_PATH/keys/publickey 2>/dev/null`"
     fi
 
@@ -177,6 +177,10 @@ get_client_qr(){
     echo ""
 }
 
+if [ -z "$1" ]; then
+    usage
+fi
+
 while [ "$1" != "" ]; do
     case $1 in
         -g | --generate-key )   shift
@@ -202,13 +206,10 @@ while [ "$1" != "" ]; do
                                 ;;
         -a | --add-client )     shift
                                 if [ -z "$1" ]; then
-                                    echo "Usage: wg-cli -a client_name IP/MASK (ex. wg-cli -a pixel4 '10.200.200.2/32')"
-                                    exit 1
-                                elif [ -z "$2" ]; then
-                                    echo "Usage: wg-cli -a client_name IP/MASK (ex. wg-cli -a pixel4 '10.200.200.2/32')"
+                                    echo "Usage: wg-cli -a client_name"
                                     exit 1
                                 else
-                                    add_client "clients/$1" "$2"
+                                    add_client "clients/$1"
                                 fi
                                 exit
                                 ;;
