@@ -6,7 +6,8 @@ CLI helper to handle the basic WireGuard configuration stuff.
 
 ## Install WireGuard on your Server / Client
 
-[Official setup guide](https://www.wireguard.com/install/)
+- [Official setup guide](https://www.wireguard.com/install/).
+- optional : qrencode (share configuration file with your mobile).
 
 ## Quick usage
 
@@ -28,6 +29,6 @@ Arguments:
       -g [client-name]      Generate a new key pair, if no « client-name » specified its generate the server key/pair.
       -c client-name        Create a new client.
       -a client-name        Add the requested client into the server configuration.
-      -q client-name        Show the QRCode of the requested « client-name ».
+      -q client-name        Show the QRCode of the requested « client-name ». (require qrencode)
       -h                    Print help (this text) and exit.
 ```
