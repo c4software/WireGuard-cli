@@ -1,23 +1,29 @@
 # Wireguard Cli
 
-🚧 Currently in WIP 🚧
+Wireguard CLI is an helper to handle the basic WireGuard configuration stuff.
 
-CLI helper to handle the basic WireGuard configuration stuff.
+- Create key pair (private and public keys)
+- Create the server configuration.
+- Create a new client.
+- Add client to the server configuration.
+- Share the client configuration via QRCode.
 
 ## Install WireGuard on your Server / Client
 
 - [Official setup guide](https://www.wireguard.com/install/).
-- optional : qrencode (share configuration file with your mobile).
+- Optional : qrencode (to share the client configuration).
 
 ## Quick usage
 
-Creat a client and the related server configuration.
+Create a client and server initialize a new new server configuration (if absent).
 
 ```wg-cli -a client```
 
 Show the QRCode client configuration :
 
 ```wg-cli -q client```
+
+![demo](./demo.gif)
 
 ## Usage
 
