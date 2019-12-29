@@ -28,7 +28,7 @@ Show the QRCode client configuration :
 ## Usage
 
 ```sh
-Usage: wg-cli [[[-g [client-name]] | [-i] | [-a client-name] | [-c client-name] | [-h] | [-q client-name]]
+Usage: wg-cli [-g [client-name]] | [-i] | [-a client-name] | [-c client-name] | [-h] | [-q client-name]
 
 Arguments:
       -i                    Init the server configuration file.
