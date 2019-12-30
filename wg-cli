@@ -181,7 +181,8 @@ add_client()
 echo "
 [Peer]
 PublicKey = $CLIENT_PUBLIC_KEY
-AllowedIPs = $CLIENT_IPs" >> $SERVER_CONFIGURATION_FILE_PATH
+AllowedIPs = $CLIENT_IPs
+PersistentKeepalive = 25" >> $SERVER_CONFIGURATION_FILE_PATH
 
     echo ""
     echo "Configuration updated. Reload the server to update the loaded configuration."
