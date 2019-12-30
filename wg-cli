@@ -93,7 +93,8 @@ PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING 
     # sysctl -p
 
     echo ""
-    echo "If you want Internet shared with your client, don't forget to enable ipv4 forwarding."
+    echo "If you want Internet shared with your client, don't forget to enable ipv4 and ipv6 forwarding."
+    echo "net.ipv4.ip_forward = 1 and net.ipv6.conf.all.forwarding = 1"
     echo "vim /etc/systctl.conf"
     echo "# and then"
     echo "sysctl -p"
