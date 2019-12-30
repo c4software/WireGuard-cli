@@ -13,6 +13,15 @@ Wireguard CLI is an helper to handle the basic WireGuard configuration stuff.
 - [Official setup guide](https://www.wireguard.com/install/).
 - Optional : qrencode (to share the client configuration).
 
+## Configuration
+
+To make this script fully automated, edit the `wg-cli` and change with your correct value
+
+```conf
+SERVER_ENDPOINT="YOUR_SERVER_EXTERNAL_IP:$SERVER_PORT"
+SERVER_INTERFACE="enp0s3"
+```
+
 ## Quick usage
 
 Create a client and server initialize a new new server configuration (if absent).
@@ -24,6 +33,16 @@ Show the QRCode client configuration :
 ```wg-cli -q client```
 
 ![demo](./demo.gif)
+
+- Copy the configuration to your `/etc/wireguard` folder and then :
+
+```sh
+wg-quick up wg0
+# If you want to update your current configuration
+wg-quick down wg0
+# and then
+wg-quick up wg0
+```
 
 ## Usage
 
