@@ -4,9 +4,12 @@ TARGET_FOLDER="./configurations"
 SERVER_PORT="9888"
 SERVER_ENDPOINT="YOUR_SERVER_EXTERNAL_IP:$SERVER_PORT"
 SERVER_INTERFACE="enp0s3"
-IP_BASE="10.200.200"
-MASK="32"
-SERVER_IP="$IP_BASE.1/$MASK"
+IPV4_BASE="10.200.200"
+IPV4_MASK="32"
+SERVER_IPV4="$IPV4_BASE.1/$IPV4_MASK"
+IPV6_BASE="fd42:42:42"
+IPV6_MASK="64"
+SERVER_IPV6="$IPV6_BASE::1/$IPV6_MASK"
 SERVER_DNS="1.1.1.1"
 
 usage()
@@ -78,7 +81,7 @@ init_server()
     # Server configuration
     echo "[Interface]
 PrivateKey = $PRIVATEKEY
-Address = $SERVER_IP
+Address = $SERVER_IPV4,$SERVER_IPV6
 ListenPort = $SERVER_PORT
 PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -A POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE
 PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -t nat -D POSTROUTING -o $SERVER_INTERFACE -j MASQUERADE
@@ -103,7 +106,8 @@ create_client()
 
     CLIENTS_FOLDER_PATH="$TARGET_FOLDER/clients/"
     CLIENT_COUNT=`ls -l $CLIENTS_FOLDER_PATH | grep -c ^d`
-    CLIENT_IP="$IP_BASE.$((CLIENT_COUNT+2))/$MASK"
+    CLIENT_IPV4="$IPV4_BASE.$((CLIENT_COUNT+2))/$IPV4_MASK"
+    CLIENT_IPV6="$IPV6_BASE::$((CLIENT_COUNT+2))/$IPV6_MASK"
 
     if [ -d "$CLIENT_TARGET_PATH" ]; then
         echo "Client configuration folder seems already present… Ignoring !"
@@ -135,7 +139,7 @@ create_client()
 
     echo "[Interface]
 PrivateKey = $CLIENT_PRIVATE_KEY 
-Address = $CLIENT_IP
+Address = $CLIENT_IPV4,$CLIENT_IPV6
 DNS = $SERVER_DNS
 
 [Peer]
@@ -153,7 +157,6 @@ add_client()
     CLIENT_PATH=$1
     CLIENT_TARGET_PATH="$TARGET_FOLDER/$CLIENT_PATH"
     SERVER_CONFIGURATION_FILE_PATH="$TARGET_FOLDER/wg0.conf"
-    CLIENT_IP=`grep "Address = " $CLIENT_TARGET_PATH/wg0.conf | sed "s/Address = //"`
 
     # Get the public key of the client
     CLIENT_PUBLIC_KEY="`cat $TARGET_FOLDER/$CLIENT_PATH/keys/publickey 2>/dev/null`"
@@ -167,6 +170,8 @@ add_client()
         init_server
     fi
 
+    CLIENT_IPs=`grep "Address = " $CLIENT_TARGET_PATH/wg0.conf | sed "s/Address = //"`
+
     echo ""
     echo "================================================"
     echo "= Add the client into the server configuration ="
@@ -175,7 +180,7 @@ add_client()
 echo "
 [Peer]
 PublicKey = $CLIENT_PUBLIC_KEY
-AllowedIPs = $CLIENT_IP" >> $SERVER_CONFIGURATION_FILE_PATH
+AllowedIPs = $CLIENT_IPs" >> $SERVER_CONFIGURATION_FILE_PATH
 
     echo ""
     echo "Configuration updated. Reload the server to update the loaded configuration."
