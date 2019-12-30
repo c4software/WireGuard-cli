@@ -22,6 +22,12 @@ SERVER_ENDPOINT="YOUR_SERVER_EXTERNAL_IP:$SERVER_PORT"
 SERVER_INTERFACE="enp0s3"
 ```
 
+You can obtain your server interface with :
+
+```sh
+ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1
+```
+
 ## Quick usage
 
 Create a client and server initialize a new new server configuration (if absent).
