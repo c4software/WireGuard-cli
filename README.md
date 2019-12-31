@@ -8,6 +8,8 @@ Wireguard CLI is an helper to handle the basic WireGuard configuration stuff.
 - Add client to the server configuration.
 - Share the client configuration via QRCode.
 
+🎉 This tool platform independant. You can generate your client/server configurations on every plateform supported by the `wg` command.
+
 ## Install WireGuard on your Server / Client
 
 - [Official setup guide](https://www.wireguard.com/install/).
