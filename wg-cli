@@ -1,9 +1,8 @@
 #!/bin/bash
-
 TARGET_FOLDER="./configurations"
 SERVER_PORT="9888"
-SERVER_ENDPOINT="YOUR_SERVER_EXTERNAL_IP:$SERVER_PORT"
-SERVER_INTERFACE="enp0s3"
+PUBLIC_IP=`curl -s https://ipinfo.io/ip`
+SERVER_ENDPOINT="$PUBLIC_IP:$SERVER_PORT"
 IPV4_BASE="10.200.200"
 IPV4_MASK="32"
 SERVER_IPV4="$IPV4_BASE.1/$IPV4_MASK"
@@ -11,6 +10,12 @@ IPV6_BASE="fd00"
 IPV6_MASK="128"
 SERVER_IPV6="$IPV6_BASE::1/$IPV6_MASK"
 SERVER_DNS="1.1.1.1"
+
+PLATFORM="$(uname -s)"
+case "${PLATFORM}" in
+    Linux*)     SERVER_INTERFACE=`ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1`;;
+    *)          SERVER_INTERFACE="enp0s3";;
+esac
 
 usage()
 {
