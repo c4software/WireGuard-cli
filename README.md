@@ -17,7 +17,7 @@ Wireguard CLI is an helper to handle the basic WireGuard configuration stuff.
 
 ## Configuration
 
-To make this script fully automated, edit the `wg-cli` and change with your correct value
+The script **should** detect your public IP & your main network interface, but if its not the case,  edit the `wg-cli` and this two variables with your correct value
 
 ```conf
 SERVER_ENDPOINT="YOUR_SERVER_EXTERNAL_IP:$SERVER_PORT"
